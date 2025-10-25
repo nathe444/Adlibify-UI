@@ -14,9 +14,10 @@ import {
 
 interface HeaderProps {
   onAuthClick: () => void;
+  onUpgradeClick: () => void;
 }
 
-export const Header = ({ onAuthClick }: HeaderProps) => {
+export const Header = ({ onAuthClick, onUpgradeClick }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -75,6 +76,17 @@ export const Header = ({ onAuthClick }: HeaderProps) => {
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-semibold text-foreground">{user.credits} credits</span>
             </div>
+          )}
+
+          {user && user.credits < 5 && (
+            <Button 
+              variant="luxury" 
+              size="sm" 
+              onClick={onUpgradeClick}
+              className="hidden md:inline-flex"
+            >
+              Upgrade
+            </Button>
           )}
 
           <Button
@@ -142,10 +154,24 @@ export const Header = ({ onAuthClick }: HeaderProps) => {
               </Button>
             )}
             {user && (
-              <div className="flex items-center justify-between py-2 px-4 rounded-lg bg-primary/5 mt-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-semibold text-foreground">{user.credits} credits</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between py-2 px-4 rounded-lg bg-primary/5">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-semibold text-foreground">{user.credits} credits</span>
+                  </div>
+                  {user.credits < 5 && (
+                    <Button 
+                      variant="luxury" 
+                      size="sm" 
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        onUpgradeClick();
+                      }}
+                    >
+                      Upgrade
+                    </Button>
+                  )}
                 </div>
                 <Button 
                   variant="outline" 

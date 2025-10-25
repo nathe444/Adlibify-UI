@@ -38,7 +38,7 @@ export const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass-luxury border-primary/20 sm:max-w-[600px]">
+      <DialogContent className="dark:glass-luxury  border-primary/20 sm:max-w-[600px] ">
         <DialogHeader>
           <DialogTitle className="text-3xl font-display text-center flex items-center justify-center gap-2">
             <Crown className="h-8 w-8 text-primary" />
@@ -53,7 +53,7 @@ export const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-2 py-2">
           {creditPacks.map((pack) => (
             <div
               key={pack.id}
@@ -101,7 +101,7 @@ export const PaywallModal = ({ open, onClose }: PaywallModalProps) => {
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-primary/20 space-y-2">
+              <div className="mt-4 pt-4 border-t border-primary/20 space-y-2 flex justify-between">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Check className="h-4 w-4 text-primary" />
                   <span>All video types included</span>

@@ -14,7 +14,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header onAuthClick={() => setAuthModalOpen(true)} />
+      <Header 
+        onAuthClick={() => setAuthModalOpen(true)} 
+        onUpgradeClick={() => setPaywallModalOpen(true)} 
+      />
       
       <main className="flex-grow">
         <Routes>
