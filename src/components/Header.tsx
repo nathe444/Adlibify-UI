@@ -36,7 +36,7 @@ export const Header = ({ onAuthClick, onUpgradeClick }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass-luxury">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center justify-around px-4">
 
         {/* Mobile menu button */}
         <Button
@@ -78,7 +78,7 @@ export const Header = ({ onAuthClick, onUpgradeClick }: HeaderProps) => {
             </div>
           )}
 
-          {user && user.credits < 5 && (
+          {user && (
             <Button 
               variant="luxury" 
               size="sm" 
@@ -160,18 +160,16 @@ export const Header = ({ onAuthClick, onUpgradeClick }: HeaderProps) => {
                     <Sparkles className="h-4 w-4 text-primary" />
                     <span className="text-sm font-semibold text-foreground">{user.credits} credits</span>
                   </div>
-                  {user.credits < 5 && (
-                    <Button 
-                      variant="luxury" 
-                      size="sm" 
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        onUpgradeClick();
-                      }}
-                    >
-                      Upgrade
-                    </Button>
-                  )}
+                  <Button 
+                    variant="luxury" 
+                    size="sm" 
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onUpgradeClick();
+                    }}
+                  >
+                    Upgrade
+                  </Button>
                 </div>
                 <Button 
                   variant="outline" 
