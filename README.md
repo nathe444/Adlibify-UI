@@ -1,73 +1,201 @@
-# Welcome to your Lovable project
+# adlibify - Premium Video Generation Platform
 
-## Project info
+A luxury AI-powered video generation SaaS with three powerful workflows: UGC Product, Service Business, and Software UI + Logo.
 
-**URL**: https://lovable.dev/projects/d85f945e-dc15-45fb-80a2-1f3aeabf3563
+## 🚀 Features
 
-## How can I edit this code?
+- **Three Generation Workflows**
+  - UGC Product: User-generated content style product ads
+  - Service Business: Professional service-style videos
+  - Software UI + Logo: Sleek software demonstrations
 
-There are several ways of editing your application.
+- **Authentication System**
+  - Email/password sign-in and sign-up
+  - Mock phone verification (Twilio integration ready)
+  - Session management with localStorage
 
-**Use Lovable**
+- **Credit-Based System**
+  - New users start with 5 free credits
+  - Mock Stripe integration for purchasing credit packs
+  - Real-time credit tracking
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d85f945e-dc15-45fb-80a2-1f3aeabf3563) and start prompting.
+- **Generation History & CRM**
+  - Track all generated videos
+  - Lead management dashboard
+  - Quick re-run and download actions
 
-Changes made via Lovable will be committed automatically to this repo.
+- **n8n Webhook Integration**
+  - Send generation data to n8n workflows
+  - Three webhook endpoints (one per workflow type)
+  - JSON payload inspection
 
-**Use your preferred IDE**
+## 🎨 Design System
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+The app uses a luxury design aesthetic with:
+- **Fonts**: Playfair Display (headings), Inter (body)
+- **Colors**: Luxury Gold (#D4AF37), Deep Black (#0A0A0A)
+- **Effects**: Glassmorphism, gold glows, smooth animations
+- **Responsive**: Mobile-first approach
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Tech Stack
 
-Follow these steps:
+- **Framework**: React 18 + TypeScript
+- **Styling**: Tailwind CSS with custom design tokens
+- **UI Components**: shadcn/ui
+- **Routing**: React Router v6
+- **State**: React Context API
+- **Animations**: CSS transitions
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📦 Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+```bash
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## 🔑 Mock Integrations
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Supabase (Mock)
+Located in `src/lib/mockData.ts`:
+- `mockSupabase.auth.signUp()` - Create new user
+- `mockSupabase.auth.signIn()` - Authenticate user
+- `mockSupabase.auth.signOut()` - Sign out user
+- `mockSupabase.auth.getUser()` - Get current user
 
-**Use GitHub Codespaces**
+**To replace with real Supabase:**
+1. Install `@supabase/supabase-js`
+2. Create Supabase client with your keys
+3. Replace mock functions in `src/contexts/AuthContext.tsx`
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Stripe (Mock)
+Located in `src/lib/mockData.ts`:
+- `mockStripe.checkout(packId)` - Process payment
 
-## What technologies are used for this project?
+**To replace with real Stripe:**
+1. Install `@stripe/stripe-js`
+2. Add your Stripe publishable key
+3. Update `src/components/PaywallModal.tsx` to use Stripe Checkout
+4. Set up webhook for payment confirmation
 
-This project is built with:
+### Twilio (Mock)
+Located in `src/lib/mockData.ts`:
+- `mockTwilio.sendVerificationCode(phone)` - Send SMS code
+- `mockTwilio.verifyCode(phone, code)` - Verify code
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+**Test code**: `123456`
 
-## How can I deploy this project?
+**To replace with real Twilio:**
+1. Install `twilio` package (for backend)
+2. Add Twilio credentials to environment variables
+3. Create API endpoint for SMS sending
+4. Update `src/components/AuthModal.tsx`
 
-Simply open [Lovable](https://lovable.dev/projects/d85f945e-dc15-45fb-80a2-1f3aeabf3563) and click on Share -> Publish.
+### n8n Webhooks (Mock)
+Located in `src/lib/mockData.ts`:
+- `mockN8n.sendWebhook(workflow, payload)` - Send to webhook
 
-## Can I connect a custom domain to my Lovable project?
+**Webhook URLs:**
+- UGC Product: `https://example-n8n.webhook/ugc-product`
+- Service Business: `https://example-n8n.webhook/service-business`
+- Software UI + Logo: `https://example-n8n.webhook/software-ui-logo`
 
-Yes, you can!
+**To replace with real n8n:**
+1. Create n8n workflows
+2. Get webhook URLs from n8n
+3. Update URLs in `src/lib/mockData.ts`
+4. Add authentication if needed
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 👤 Test Accounts
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+**Demo Account:**
+- Email: `demo@luxevideo.test`
+- Password: `Password123!`
+- Credits: 5
+
+**Create New Account:**
+Any email/password combination will work in mock mode. New accounts receive 5 free credits.
+
+## 📁 Project Structure
+
+```
+src/
+├── assets/              # Images and static files
+├── components/          # React components
+│   ├── ui/             # shadcn/ui components
+│   ├── Header.tsx      # Navigation header
+│   ├── AuthModal.tsx   # Login/signup modal
+│   └── PaywallModal.tsx # Credit purchase modal
+├── contexts/           # React contexts
+│   └── AuthContext.tsx # Authentication state
+├── lib/                # Utilities
+│   ├── mockData.ts     # Mock integrations
+│   └── utils.ts        # Helper functions
+├── pages/              # Page components
+│   ├── Landing.tsx     # Landing page
+│   ├── Studio.tsx      # Video generation studio
+│   └── History.tsx     # Generation history & CRM
+├── types/              # TypeScript types
+│   └── index.ts        # Type definitions
+└── App.tsx             # Main app component
+```
+
+## 🎯 Acceptance Criteria
+
+✅ App runs locally with luxury design system  
+✅ Three generator tabs with functional inputs  
+✅ Login/SignUp modal with phone verification  
+✅ Paywall modal with credit purchase  
+✅ Credit-based generation system  
+✅ n8n webhook simulation  
+✅ History & CRM UI  
+✅ Responsive design  
+✅ Accessible (keyboard navigation, ARIA labels)  
+✅ Mock integrations documented  
+
+## 🔄 Next Steps (Milestone 2+)
+
+1. **Backend Integration**
+   - Connect real Supabase database
+   - Implement actual Stripe payments
+   - Add Twilio SMS verification
+   - Set up n8n workflows
+
+2. **Video Processing**
+   - Implement actual video generation
+   - Add video preview player
+   - Enable video downloads
+
+3. **Advanced Features**
+   - Advanced template customization
+   - Batch video generation
+   - Analytics dashboard
+   - Team collaboration
+
+## 📚 Documentation
+
+- **Design System**: See `src/index.css` for all design tokens
+- **Components**: All components use semantic design tokens
+- **API Integration**: Check `src/lib/mockData.ts` for integration points
+
+## 🤝 Contributing
+
+This is Milestone 1 - front-end prototype. For production:
+1. Replace all mock integrations with real services
+2. Add proper error handling
+3. Implement rate limiting
+4. Add comprehensive testing
+5. Set up CI/CD pipeline
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+Built with ❤️ using Lovable.dev
