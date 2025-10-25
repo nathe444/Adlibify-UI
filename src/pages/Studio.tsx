@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button-variants';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,12 +25,34 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ctaText, setCtaText] = useState('');
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  
+  // File input refs
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
 
   const filteredTemplates = videoTemplates.filter(t => 
     activeTab === 'software-ui' ? 
       t.category === 'software-ui' : 
       t.category === activeTab
   );
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      toast.success(`Logo uploaded: ${file.name}`);
+    }
+  };
+
+  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setMediaFiles(prev => [...prev, ...files]);
+      toast.success(`${files.length} file(s) uploaded`);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!user) {
@@ -43,7 +65,7 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
       return;
     }
 
-    if (!title || !description) {
+    if (!title.trim() || !description.trim()) {
       toast.error('Please fill in title and description');
       return;
     }
@@ -155,18 +177,48 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
           {activeTab === 'software-ui' && (
             <div className="space-y-2">
               <Label htmlFor="logo">Brand Logo</Label>
-              <div className="glass-luxury border-primary/20 border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/40 transition-colors cursor-pointer">
+              <input
+                ref={logoInputRef}
+                type="file"
+                id="logo"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+              <div 
+                onClick={() => logoInputRef.current?.click()}
+                className="glass-luxury border-primary/20 border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/40 transition-colors cursor-pointer"
+              >
                 <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">Click to upload logo</p>
+                {logoFile ? (
+                  <p className="text-sm text-primary">{logoFile.name}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Click to upload logo</p>
+                )}
               </div>
             </div>
           )}
 
           <div className="space-y-2">
             <Label>Product/Media Upload</Label>
-            <div className="glass-luxury border-primary/20 border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/40 transition-colors cursor-pointer">
+            <input
+              ref={mediaInputRef}
+              type="file"
+              multiple
+              accept="image/*,video/*"
+              onChange={handleMediaUpload}
+              className="hidden"
+            />
+            <div 
+              onClick={() => mediaInputRef.current?.click()}
+              className="glass-luxury border-primary/20 border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/40 transition-colors cursor-pointer"
+            >
               <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Drag & drop files or click to browse</p>
+              {mediaFiles.length > 0 ? (
+                <p className="text-sm text-primary">{mediaFiles.length} file(s) selected</p>
+              ) : (
+                <p className="text-sm text-muted-foreground">Drag & drop files or click to browse</p>
+              )}
             </div>
           </div>
         </div>
