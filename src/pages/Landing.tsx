@@ -2,9 +2,51 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button-variants';
 import { Sparkles, Video, Zap, Users, Play } from 'lucide-react';
 import heroImage from '@/assets/hero-background.jpg';
-import { videoTemplates } from '@/lib/mockData';
+import { useState } from 'react';
+
+// Updated video examples with more appropriate descriptive videos for each category
+const videoExamples = [
+  {
+    id: 'product-ad',
+    title: 'Product Advertisement',
+    description: 'Showcase your products with dynamic visuals and compelling storytelling',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    duration: '15s',
+    category: 'product-ad'
+  },
+  {
+    id: 'service-ad',
+    title: 'Service Advertisement',
+    description: 'Highlight your professional services with polished presentations',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    duration: '20s',
+    category: 'service-ad'
+  },
+  {
+    id: 'software-ad',
+    title: 'Software Advertisement',
+    description: 'Demonstrate your software features with clean UI walkthroughs',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    duration: '25s',
+    category: 'software-ad'
+  },
+  {
+    id: 'ugc-content',
+    title: 'UGC Content',
+    description: 'Authentic user-generated style content for social media marketing',
+    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    duration: '10s',
+    category: 'ugc-content'
+  }
+];
 
 export default function Landing() {
+  const [videoError, setVideoError] = useState<Record<string, boolean>>({});
+
+  const handleVideoError = (id: string) => {
+    setVideoError(prev => ({ ...prev, [id]: true }));
+  };
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -63,33 +105,33 @@ export default function Landing() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="glass-luxury p-8 space-y-4 transition-all hover:-translate-y-2">
+            <div className="glass-luxury p-8 space-y-4 transition-all hover:-translate-y-2 rounded-xl">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Video className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-display font-bold">UGC Product</h3>
+              <h3 className="text-2xl font-display font-bold">Product Advertisement</h3>
               <p className="text-muted-foreground">
-                Create authentic user-generated content style product advertisements that convert
+                Create compelling product showcase videos that drive conversions
               </p>
             </div>
 
-            <div className="glass-luxury p-8 space-y-4 transition-all hover:-translate-y-2">
+            <div className="glass-luxury p-8 space-y-4 transition-all hover:-translate-y-2 rounded-xl">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Users className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-display font-bold">Service Business</h3>
+              <h3 className="text-2xl font-display font-bold">Service Advertisement</h3>
               <p className="text-muted-foreground">
                 Professional service-style videos that build trust and showcase your expertise
               </p>
             </div>
 
-            <div className="glass-luxury p-8 space-y-4 transition-all hover:-translate-y-2">
+            <div className="glass-luxury p-8 space-y-4 transition-all hover:-translate-y-2 rounded-xl">
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Zap className="h-6 w-6 text-primary" />
               </div>
-              <h3 className="text-2xl font-display font-bold">Software UI</h3>
+              <h3 className="text-2xl font-display font-bold">Software Advertisement</h3>
               <p className="text-muted-foreground">
-                Sleek software walkthroughs and logo animations that impress
+                Sleek software walkthroughs and UI demonstrations that impress
               </p>
             </div>
           </div>
@@ -109,17 +151,29 @@ export default function Landing() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {videoTemplates.map((template) => (
+            {videoExamples.map((example) => (
               <div
-                key={template.id}
+                key={example.id}
                 className="group glass-luxury rounded-xl overflow-hidden transition-all hover:-translate-y-2"
               >
                 <div className="relative aspect-video overflow-hidden">
-                  <img
-                    src={template.thumbnail}
-                    alt={template.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
+                  {videoError[example.id] ? (
+                    // Fallback to a placeholder image if video fails to load
+                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+                      <Video className="h-12 w-12 text-primary/30" />
+                    </div>
+                  ) : (
+                    // Use video URL
+                    <video
+                      src={example.videoUrl}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      onError={() => handleVideoError(example.id)}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-sm flex items-center justify-center border border-primary/30">
                       <Play className="h-8 w-8 text-primary ml-1" fill="currentColor" />
@@ -127,10 +181,11 @@ export default function Landing() {
                   </div>
                 </div>
                 <div className="p-4 space-y-2">
-                  <h3 className="font-display font-semibold text-lg">{template.name}</h3>
+                  <h3 className="font-display font-semibold text-lg">{example.title}</h3>
+                  <p className="text-sm text-muted-foreground">{example.description}</p>
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{template.duration}s</span>
-                    <span className="capitalize">{template.category.replace('-', ' ')}</span>
+                    <span>{example.duration}</span>
+                    <span className="capitalize">{example.category.replace('-', ' ')}</span>
                   </div>
                 </div>
               </div>
@@ -147,10 +202,10 @@ export default function Landing() {
               Ready to Transform Your Content?
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Start with 5 free credits when you sign up today
+              Start with free credits when you sign up today
             </p>
             <Link to="/studio">
-              <Button variant="luxury" size="xl">
+              <Button variant="luxury" size="xl" className='mt-8'>
                 Get Started Now
                 <Sparkles className="ml-2 h-5 w-5" />
               </Button>

@@ -94,7 +94,7 @@ export const AuthModal = ({ open, onClose }: AuthModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="glass-luxury border-primary/20 sm:max-w-[480px]">
+      <DialogContent className="dark:glass-luxury border-primary/20 sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-display text-center">Welcome to adlibify</DialogTitle>
           <DialogDescription className="text-center text-muted-foreground">
@@ -103,7 +103,7 @@ export const AuthModal = ({ open, onClose }: AuthModalProps) => {
         </DialogHeader>
 
         <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 glass-luxury">
+          <TabsList className="grid w-full grid-cols-2  glass-luxury">
             <TabsTrigger value="signin" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Sign In
             </TabsTrigger>

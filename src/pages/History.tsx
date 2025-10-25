@@ -135,7 +135,8 @@ export default function History() {
             </div>
           ) : (
             <div className="glass-luxury rounded-lg overflow-hidden">
-              <table className="w-full">
+              {/* Desktop table - hidden on mobile */}
+              <table className="w-full hidden md:table">
                 <thead className="bg-primary/10">
                   <tr>
                     <th className="text-left p-4 font-display">Name</th>
@@ -159,6 +160,34 @@ export default function History() {
                   ))}
                 </tbody>
               </table>
+              
+              {/* Mobile view - hidden on desktop */}
+              <div className="md:hidden">
+                {leads.map((lead) => (
+                  <div key={lead.id} className="border-b border-border/40 last:border-b-0">
+                    <div className="p-4 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <h3 className="font-display font-bold text-lg">{lead.name}</h3>
+                        <span className="text-sm text-muted-foreground">
+                          {formatDistanceToNow(lead.createdAt, { addSuffix: true })}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <p className="text-sm">
+                          <span className="font-semibold">Email:</span> {lead.email}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-semibold">Phone:</span> {lead.phone || '—'}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-semibold">Project:</span> {lead.projectId || '—'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </TabsContent>

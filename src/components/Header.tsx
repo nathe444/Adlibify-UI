@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Sparkles, User, Moon, Sun } from 'lucide-react';
+import { Sparkles, User, Moon, Sun, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button-variants';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
@@ -19,6 +19,7 @@ interface HeaderProps {
 export const Header = ({ onAuthClick }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleTheme = () => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -26,26 +27,45 @@ export const Header = ({ onAuthClick }: HeaderProps) => {
     document.documentElement.classList.toggle('dark');
   };
 
+  const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Studio', path: '/studio' },
+    { name: 'History', path: '/history' },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 glass-luxury">
       <div className="container flex h-16 items-center justify-between px-4">
+
+        {/* Mobile menu button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden rounded-full"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </Button>
+        
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 transition-transform hover:scale-105">
           <Sparkles className="h-6 w-6 text-primary" />
           <span className="text-2xl font-display font-bold text-foreground">adlibify</span>
         </Link>
 
-        {/* Center Nav */}
+        
+
+        {/* Center Nav - Desktop */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Home
-          </Link>
-          <Link to="/studio" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Studio
-          </Link>
-          <Link to="/history" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            History
-          </Link>
+          {navItems.map((item) => (
+            <Link 
+              key={item.path} 
+              to={item.path} 
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {item.name}
+            </Link>
+          ))}
         </nav>
 
         {/* Right Actions */}
@@ -88,12 +108,58 @@ export const Header = ({ onAuthClick }: HeaderProps) => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="luxury" onClick={onAuthClick}>
+            <Button variant="luxury" onClick={onAuthClick} className="hidden md:inline-flex">
               Sign In
             </Button>
           )}
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-border/40 glass-luxury px-4 py-3">
+          <nav className="flex flex-col gap-3">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="text-base font-medium text-foreground py-2 px-4 rounded-lg hover:bg-primary/10 transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+            {!user && (
+              <Button 
+                variant="luxury" 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onAuthClick();
+                }} 
+                className="mt-2"
+              >
+                Sign In
+              </Button>
+            )}
+            {user && (
+              <div className="flex items-center justify-between py-2 px-4 rounded-lg bg-primary/5 mt-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-foreground">{user.credits} credits</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => signOut()}
+                  className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

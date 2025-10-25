@@ -5,9 +5,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { videoTemplates, mockN8n } from '@/lib/mockData';
+import { mockN8n } from '@/lib/mockData';
 import { toast } from 'sonner';
-import { Sparkles, Upload, Send, Loader2 } from 'lucide-react';
+import { Sparkles, Upload, Send, Loader2, Globe } from 'lucide-react';
 import { GenerationHistory } from '@/types';
 
 interface StudioProps {
@@ -19,38 +19,46 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
   const [activeTab, setActiveTab] = useState<'ugc-product' | 'service-business' | 'software-ui'>('ugc-product');
   const [generating, setGenerating] = useState(false);
   const [sendingWebhook, setSendingWebhook] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
-  // Form state
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [ctaText, setCtaText] = useState('');
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  // Form state for UGC Product
+  const [productName, setProductName] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [productImage, setProductImage] = useState<File | null>(null);
+  
+  // Form state for Service Business
+  const [businessWebsiteUrl, setBusinessWebsiteUrl] = useState('');
+  
+  // Form state for Software UI
+  const [companyName, setCompanyName] = useState('');
+  const [logoImage, setLogoImage] = useState<File | null>(null);
+  const [uiScreenshot, setUiScreenshot] = useState<File | null>(null);
   
   // File input refs
-  const logoInputRef = useRef<HTMLInputElement>(null);
-  const mediaInputRef = useRef<HTMLInputElement>(null);
+  const productImageInputRef = useRef<HTMLInputElement>(null);
+  const logoImageInputRef = useRef<HTMLInputElement>(null);
+  const uiScreenshotInputRef = useRef<HTMLInputElement>(null);
 
-  const filteredTemplates = videoTemplates.filter(t => 
-    activeTab === 'software-ui' ? 
-      t.category === 'software-ui' : 
-      t.category === activeTab
-  );
-
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProductImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setLogoFile(file);
+      setProductImage(file);
+      toast.success(`Product image uploaded: ${file.name}`);
+    }
+  };
+
+  const handleLogoImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoImage(file);
       toast.success(`Logo uploaded: ${file.name}`);
     }
   };
 
-  const handleMediaUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setMediaFiles(prev => [...prev, ...files]);
-      toast.success(`${files.length} file(s) uploaded`);
+  const handleUiScreenshotUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUiScreenshot(file);
+      toast.success(`UI screenshot uploaded: ${file.name}`);
     }
   };
 
@@ -65,8 +73,19 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
       return;
     }
 
-    if (!title.trim() || !description.trim()) {
-      toast.error('Please fill in title and description');
+    // Validate required fields based on active tab
+    if (activeTab === 'ugc-product' && (!productName.trim() || !websiteUrl.trim())) {
+      toast.error('Please fill in product name and website URL');
+      return;
+    }
+
+    if (activeTab === 'service-business' && !businessWebsiteUrl.trim()) {
+      toast.error('Please fill in business website URL');
+      return;
+    }
+
+    if (activeTab === 'software-ui' && (!companyName.trim())) {
+      toast.error('Please fill in company name');
       return;
     }
 
@@ -82,10 +101,18 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
     const history: GenerationHistory = {
       id: Math.random().toString(36).substr(2, 9),
       userId: user.id,
-      title,
-      description,
-      template: videoTemplates[0],
-      thumbnail: videoTemplates[0].thumbnail,
+      title: activeTab === 'ugc-product' ? productName : 
+             activeTab === 'software-ui' ? companyName : 'Service Business Video',
+      description: activeTab === 'ugc-product' ? `Product: ${productName}` : 
+                   activeTab === 'software-ui' ? `Company: ${companyName}` : `Business: ${businessWebsiteUrl}`,
+      template: {
+        id: 'default',
+        name: 'Default Template',
+        thumbnail: '',
+        category: activeTab,
+        duration: 30,
+      },
+      thumbnail: '',
       createdAt: new Date(),
       creditsUsed: 1,
       status: 'completed',
@@ -110,14 +137,33 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
                      activeTab === 'service-business' ? 'service-business' : 
                      'software-ui-logo';
 
-    const payload = {
+    let payload: any = {
       userId: user.id,
       projectId: Math.random().toString(36).substr(2, 9),
-      title,
-      description,
-      templateId: selectedTemplate || '',
       workflow,
     };
+
+    // Add tab-specific fields to payload
+    if (activeTab === 'ugc-product') {
+      payload = {
+        ...payload,
+        productName,
+        websiteUrl,
+        productImage: productImage ? productImage.name : null,
+      };
+    } else if (activeTab === 'service-business') {
+      payload = {
+        ...payload,
+        businessWebsiteUrl,
+      };
+    } else if (activeTab === 'software-ui') {
+      payload = {
+        ...payload,
+        companyName,
+        logoImage: logoImage ? logoImage.name : null,
+        uiScreenshot: uiScreenshot ? uiScreenshot.name : null,
+      };
+    }
 
     const result = await mockN8n.sendWebhook(workflow, payload);
     setSendingWebhook(false);
@@ -131,151 +177,74 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
     }
   };
 
-  const renderTabContent = (type: string, description: string) => (
+  const renderUgcProductTab = () => (
     <div className="space-y-6">
-      <div className="glass-luxury p-6 rounded-lg">
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Left: Form */}
-        <div className="space-y-4">
+      <div className="glass-luxury p-4 md:p-6 rounded-lg">
+        <h3 className="text-xl font-display font-bold mb-3">UGC Product Details</h3>
+        <p className="text-sm text-muted-foreground mb-4">Create authentic user-generated content style product advertisements that drive engagement and conversions.</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Video Title</Label>
+            <Label htmlFor="product-name" className="text-sm">Product Name</Label>
             <Input
-              id="title"
-              placeholder="Enter video title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="glass-luxury border-primary/20"
+              id="product-name"
+              placeholder="Enter product name"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              className="glass-luxury border-border/40 focus:border-primary"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe your video content..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="glass-luxury border-primary/20 resize-none"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="cta">Call-to-Action</Label>
-            <Input
-              id="cta"
-              placeholder="e.g., Learn More, Shop Now"
-              value={ctaText}
-              onChange={(e) => setCtaText(e.target.value)}
-              className="glass-luxury border-primary/20"
-            />
-          </div>
-
-          {activeTab === 'software-ui' && (
-            <div className="space-y-2">
-              <Label htmlFor="logo">Brand Logo</Label>
-              <input
-                ref={logoInputRef}
-                type="file"
-                id="logo"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="hidden"
-              />
-              <div 
-                onClick={() => logoInputRef.current?.click()}
-                className="glass-luxury border-primary/20 border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/40 transition-colors cursor-pointer"
-              >
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                {logoFile ? (
-                  <p className="text-sm text-primary">{logoFile.name}</p>
-                ) : (
-                  <p className="text-sm text-muted-foreground">Click to upload logo</p>
-                )}
+            <Label htmlFor="website-url" className="text-sm">Website URL</Label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="website-url"
+                  placeholder="https://example.com"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  className="glass-luxury border-border/40 focus:border-primary pl-10"
+                />
               </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label>Product/Media Upload</Label>
-            <input
-              ref={mediaInputRef}
-              type="file"
-              multiple
-              accept="image/*,video/*"
-              onChange={handleMediaUpload}
-              className="hidden"
-            />
-            <div 
-              onClick={() => mediaInputRef.current?.click()}
-              className="glass-luxury border-primary/20 border-2 border-dashed rounded-lg p-6 text-center hover:border-primary/40 transition-colors cursor-pointer"
-            >
-              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              {mediaFiles.length > 0 ? (
-                <p className="text-sm text-primary">{mediaFiles.length} file(s) selected</p>
-              ) : (
-                <p className="text-sm text-muted-foreground">Drag & drop files or click to browse</p>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* Right: Templates & Preview */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Select Template</Label>
-            <div className="grid grid-cols-2 gap-3">
-              {filteredTemplates.map((template) => (
-                <div
-                  key={template.id}
-                  onClick={() => setSelectedTemplate(template.id)}
-                  className={`relative glass-luxury rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-105 ${
-                    selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
-                  }`}
-                >
-                  <img 
-                    src={template.thumbnail} 
-                    alt={template.name}
-                    className="w-full h-32 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent flex items-end p-3">
-                    <p className="text-xs font-semibold">{template.name}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Preview</Label>
-            <div className="glass-luxury rounded-lg aspect-video overflow-hidden">
-              {selectedTemplate ? (
-                <img 
-                  src={filteredTemplates.find(t => t.id === selectedTemplate)?.thumbnail} 
-                  alt="Preview"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                  <p className="text-sm">Select a template to preview</p>
-                </div>
-              )}
-            </div>
+        <div className="space-y-2 mt-4">
+          <Label htmlFor="product-image" className="text-sm">Product Image</Label>
+          <input
+            ref={productImageInputRef}
+            type="file"
+            id="product-image"
+            accept="image/*"
+            onChange={handleProductImageUpload}
+            className="hidden"
+          />
+          <div 
+            onClick={() => productImageInputRef.current?.click()}
+            className="glass-luxury border-border/40 focus-within:border-primary border-2 border-dashed rounded-lg p-4 md:p-6 text-center hover:border-primary/40 transition-colors cursor-pointer"
+          >
+            <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+            {productImage ? (
+              <p className="text-sm text-primary">{productImage.name}</p>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">Click to upload product image</p>
+                <p className="text-xs text-muted-foreground mt-1">JPG, PNG, or GIF</p>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
         <Button 
           variant="luxury" 
           size="lg" 
           onClick={handleGenerate}
           disabled={generating}
-          className="flex-1"
+          className="flex-1 w-full py-3"
         >
           {generating ? (
             <>
@@ -294,6 +263,178 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
           size="lg"
           onClick={handleSendWebhook}
           disabled={sendingWebhook}
+          className="w-full py-3"
+        >
+          {sendingWebhook ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 h-4 w-4" />
+          )}
+          Send to n8n
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderServiceBusinessTab = () => (
+    <div className="space-y-6">
+      <div className="glass-luxury p-4 md:p-6 rounded-lg">
+        <h3 className="text-xl font-display font-bold mb-3">Service Business Details</h3>
+        <p className="text-sm text-muted-foreground mb-4">Generate professional service-style videos that showcase your expertise and build trust with potential clients.</p>
+        
+        <div className="space-y-2">
+          <Label htmlFor="business-website-url" className="text-sm">Business Website URL</Label>
+          <div className="relative">
+            <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              id="business-website-url"
+              placeholder="https://yourbusiness.com"
+              value={businessWebsiteUrl}
+              onChange={(e) => setBusinessWebsiteUrl(e.target.value)}
+              className="glass-luxury border-border/40 focus:border-primary pl-10"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <Button 
+          variant="luxury" 
+          size="lg" 
+          onClick={handleGenerate}
+          disabled={generating}
+          className="flex-1 w-full py-3"
+        >
+          {generating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate Video (1 Credit)
+            </>
+          )}
+        </Button>
+        <Button 
+          variant="outline-gold"
+          size="lg"
+          onClick={handleSendWebhook}
+          disabled={sendingWebhook}
+          className="w-full py-3"
+        >
+          {sendingWebhook ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="mr-2 h-4 w-4" />
+          )}
+          Send to n8n
+        </Button>
+      </div>
+    </div>
+  );
+
+  const renderSoftwareUiTab = () => (
+    <div className="space-y-6">
+      <div className="glass-luxury p-4 md:p-6 rounded-lg">
+        <h3 className="text-xl font-display font-bold mb-3">Software UI Details</h3>
+        <p className="text-sm text-muted-foreground mb-4">Produce sleek software product demonstrations and logo animations that impress your audience.</p>
+        
+        <div className="space-y-2">
+          <Label htmlFor="company-name" className="text-sm">Company Name</Label>
+          <Input
+            id="company-name"
+            placeholder="Enter company name"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            className="glass-luxury border-border/40 focus:border-primary"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-8">
+          <div className="space-y-2">
+            <Label htmlFor="logo-image" className="text-sm">Upload Logo Image</Label>
+            <input
+              ref={logoImageInputRef}
+              type="file"
+              id="logo-image"
+              accept="image/*"
+              onChange={handleLogoImageUpload}
+              className="hidden"
+            />
+            <div 
+              onClick={() => logoImageInputRef.current?.click()}
+              className="glass-luxury border-border/40 focus-within:border-primary border-2 border-dashed rounded-lg p-4 md:p-6 text-center hover:border-primary/40 transition-colors cursor-pointer h-full flex flex-col justify-center"
+            >
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              {logoImage ? (
+                <p className="text-sm text-primary">{logoImage.name}</p>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground">Click to upload logo</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, or SVG</p>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2 mt-8 md:mt-0">
+            <Label htmlFor="ui-screenshot" className="text-sm">Upload UI Screenshot</Label>
+            <input
+              ref={uiScreenshotInputRef}
+              type="file"
+              id="ui-screenshot"
+              accept="image/*"
+              onChange={handleUiScreenshotUpload}
+              className="hidden"
+            />
+            <div 
+              onClick={() => uiScreenshotInputRef.current?.click()}
+              className="glass-luxury border-border/40 focus-within:border-primary border-2 border-dashed rounded-lg p-4 md:p-6 text-center hover:border-primary/40 transition-colors cursor-pointer h-full flex flex-col justify-center"
+            >
+              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+              {uiScreenshot ? (
+                <p className="text-sm text-primary">{uiScreenshot.name}</p>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground">Click to upload screenshot</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, or GIF</p>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+        <Button 
+          variant="luxury" 
+          size="lg" 
+          onClick={handleGenerate}
+          disabled={generating}
+          className="flex-1 w-full py-3"
+        >
+          {generating ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              Generate Video (1 Credit)
+            </>
+          )}
+        </Button>
+        <Button 
+          variant="outline-gold"
+          size="lg"
+          onClick={handleSendWebhook}
+          disabled={sendingWebhook}
+          className="w-full py-3"
         >
           {sendingWebhook ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -309,60 +450,51 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center space-y-2 animate-fade-in">
-        <h1 className="text-4xl md:text-5xl font-display font-bold">Video Studio</h1>
-        <p className="text-xl text-muted-foreground">Create professional videos in three powerful workflows</p>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold">Video Studio</h1>
+        <p className="text-base sm:text-xl text-muted-foreground px-4">Create professional videos in three powerful workflows</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
         <TabsList className="grid w-full grid-cols-3 glass-luxury h-auto p-1 mb-8">
           <TabsTrigger 
             value="ugc-product" 
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3 md:py-4 px-2"
           >
             <div className="text-center">
-              <p className="font-semibold">UGC Product</p>
-              <p className="text-xs opacity-80">User-generated content</p>
+              <p className="font-semibold text-xs sm:text-sm md:text-base">UGC Product</p>
+              <p className="text-[0.6rem] sm:text-xs opacity-80 mt-1 hidden sm:block">User-generated</p>
             </div>
           </TabsTrigger>
           <TabsTrigger 
             value="service-business"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3 md:py-4 px-2"
           >
             <div className="text-center">
-              <p className="font-semibold">Service Business</p>
-              <p className="text-xs opacity-80">Professional services</p>
+              <p className="font-semibold text-xs sm:text-sm md:text-base">Service Business</p>
+              <p className="text-[0.6rem] sm:text-xs opacity-80 mt-1 hidden sm:block">Professional</p>
             </div>
           </TabsTrigger>
           <TabsTrigger 
             value="software-ui"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3 md:py-4 px-2"
           >
             <div className="text-center">
-              <p className="font-semibold">Software UI + Logo</p>
-              <p className="text-xs opacity-80">Product walkthroughs</p>
+              <p className="font-semibold text-xs sm:text-sm md:text-base">Software UI</p>
+              <p className="text-[0.6rem] sm:text-xs opacity-80 mt-1 hidden sm:block">Walkthroughs</p>
             </div>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="ugc-product">
-          {renderTabContent(
-            'UGC Product',
-            'Create authentic user-generated content style product advertisements that drive engagement and conversions.'
-          )}
+        <TabsContent value="ugc-product" className="mt-6">
+          {renderUgcProductTab()}
         </TabsContent>
 
-        <TabsContent value="service-business">
-          {renderTabContent(
-            'Service Business',
-            'Generate professional service-style videos that showcase your expertise and build trust with potential clients.'
-          )}
+        <TabsContent value="service-business" className="mt-6">
+          {renderServiceBusinessTab()}
         </TabsContent>
 
-        <TabsContent value="software-ui">
-          {renderTabContent(
-            'Software UI + Logo',
-            'Produce sleek software product demonstrations and logo animations that impress your audience.'
-          )}
+        <TabsContent value="software-ui" className="mt-6">
+          {renderSoftwareUiTab()}
         </TabsContent>
       </Tabs>
     </div>
