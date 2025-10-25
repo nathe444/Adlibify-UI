@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button-variants';
-import { Sparkles, Video, Zap, Users } from 'lucide-react';
+import { Sparkles, Video, Zap, Users, Play } from 'lucide-react';
 import heroImage from '@/assets/hero-background.jpg';
+import { videoTemplates } from '@/lib/mockData';
 
 export default function Landing() {
   return (
@@ -91,6 +92,49 @@ export default function Landing() {
                 Sleek software walkthroughs and logo animations that impress
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Example Videos Showcase */}
+      <section className="py-24 px-4 bg-background/50">
+        <div className="container mx-auto">
+          <div className="text-center space-y-4 mb-16">
+            <h2 className="text-4xl md:text-5xl font-display font-bold">
+              Professional Video Examples
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              See the quality and style of videos you can create
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {videoTemplates.map((template) => (
+              <div
+                key={template.id}
+                className="group glass-luxury rounded-xl overflow-hidden transition-all hover:-translate-y-2"
+              >
+                <div className="relative aspect-video overflow-hidden">
+                  <img
+                    src={template.thumbnail}
+                    alt={template.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-sm flex items-center justify-center border border-primary/30">
+                      <Play className="h-8 w-8 text-primary ml-1" fill="currentColor" />
+                    </div>
+                  </div>
+                </div>
+                <div className="p-4 space-y-2">
+                  <h3 className="font-display font-semibold text-lg">{template.name}</h3>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>{template.duration}s</span>
+                    <span className="capitalize">{template.category.replace('-', ' ')}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
