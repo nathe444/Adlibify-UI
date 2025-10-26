@@ -258,7 +258,7 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
             </>
           )}
         </Button>
-        <Button 
+        {/* <Button 
           variant="outline-gold"
           size="lg"
           onClick={handleSendWebhook}
@@ -271,7 +271,7 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
             <Send className="mr-2 h-4 w-4" />
           )}
           Send to n8n
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
@@ -318,20 +318,7 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
             </>
           )}
         </Button>
-        <Button 
-          variant="outline-gold"
-          size="lg"
-          onClick={handleSendWebhook}
-          disabled={sendingWebhook}
-          className="w-full py-3"
-        >
-          {sendingWebhook ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="mr-2 h-4 w-4" />
-          )}
-          Send to n8n
-        </Button>
+        
       </div>
     </div>
   );
@@ -429,20 +416,7 @@ export default function Studio({ onInsufficientCredits }: StudioProps) {
             </>
           )}
         </Button>
-        <Button 
-          variant="outline-gold"
-          size="lg"
-          onClick={handleSendWebhook}
-          disabled={sendingWebhook}
-          className="w-full py-3"
-        >
-          {sendingWebhook ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="mr-2 h-4 w-4" />
-          )}
-          Send to n8n
-        </Button>
+        
       </div>
     </div>
   );

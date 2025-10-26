@@ -2,7 +2,10 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button-variants';
 import { Sparkles, Video, Zap, Users, Play } from 'lucide-react';
 import heroImage from '@/assets/hero-background.jpg';
-import { useState } from 'react';
+import productAdVideo from '@/assets/Hemp oil.mp4';
+import serviceAdVideo from '@/assets/urban garden ad.mp4';
+import softwareAdVideo from '@/assets/ReckonAd.mp4';
+import mobileAppVideo from '@/assets/Tradify App.mp4';
 
 // Updated video examples with more appropriate descriptive videos for each category
 const videoExamples = [
@@ -10,43 +13,37 @@ const videoExamples = [
     id: 'product-ad',
     title: 'Product Advertisement',
     description: 'Showcase your products with dynamic visuals and compelling storytelling',
-    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
-    duration: '15s',
+    videoUrl: productAdVideo,
+    duration: '10s',
     category: 'product-ad'
   },
   {
-    id: 'service-ad',
-    title: 'Service Advertisement',
-    description: 'Highlight your professional services with polished presentations',
-    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    duration: '20s',
-    category: 'service-ad'
+    id: 'mobile-app',
+    title: 'Mobile App Advertisement',
+    description: 'Highlight your mobile app with stunning visuals and expert storytelling',
+    videoUrl: mobileAppVideo,
+    duration: '11s',
+    category: 'mobile-app'
   },
   {
-    id: 'software-ad',
+    id: 'home-service',
+    title: 'Home Service Business',
+    description: 'Expertly crafted home service business videos that attract customers',
+    videoUrl: serviceAdVideo,
+    duration: '12s',
+    category: 'home-service'
+  },
+  {
+    id: 'software-ad',  
     title: 'Software Advertisement',
     description: 'Demonstrate your software features with clean UI walkthroughs',
-    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    duration: '25s',
+    videoUrl: softwareAdVideo,
+    duration: '11s',  
     category: 'software-ad'
-  },
-  {
-    id: 'ugc-content',
-    title: 'UGC Content',
-    description: 'Authentic user-generated style content for social media marketing',
-    videoUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-    duration: '10s',
-    category: 'ugc-content'
-  }
+  }  
 ];
 
 export default function Landing() {
-  const [videoError, setVideoError] = useState<Record<string, boolean>>({});
-
-  const handleVideoError = (id: string) => {
-    setVideoError(prev => ({ ...prev, [id]: true }));
-  };
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -83,11 +80,11 @@ export default function Landing() {
                 <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
               </Button>
             </Link>
-            <Link to="/studio">
-              <Button variant="outline-gold" size="xl">
+            <Button variant="outline-gold" size="xl" onClick={() =>
+              document.getElementById("examples").scrollIntoView({ behavior: "smooth" })
+            }>
                 View Examples
               </Button>
-            </Link>
           </div>
         </div>
       </section>
@@ -139,7 +136,7 @@ export default function Landing() {
       </section>
 
       {/* Example Videos Showcase */}
-      <section className="py-24 px-4 bg-background/50">
+      <section className="py-24 px-4 bg-background/50" id='examples'>
         <div className="container mx-auto">
           <div className="text-center space-y-4 mb-16">
             <h2 className="text-4xl md:text-5xl font-display font-bold">
@@ -157,23 +154,15 @@ export default function Landing() {
                 className="group glass-luxury rounded-xl overflow-hidden transition-all hover:-translate-y-2"
               >
                 <div className="relative aspect-video overflow-hidden">
-                  {videoError[example.id] ? (
-                    // Fallback to a placeholder image if video fails to load
-                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-                      <Video className="h-12 w-12 text-primary/30" />
-                    </div>
-                  ) : (
-                    // Use video URL
-                    <video
-                      src={example.videoUrl}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      onError={() => handleVideoError(example.id)}
-                    />
-                  )}
+                  {/* Use imported video file */}
+                  <video
+                    src={example.videoUrl}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-sm flex items-center justify-center border border-primary/30">
                       <Play className="h-8 w-8 text-primary ml-1" fill="currentColor" />

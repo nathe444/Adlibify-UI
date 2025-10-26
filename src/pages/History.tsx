@@ -7,7 +7,6 @@ import { formatDistanceToNow } from 'date-fns';
 
 export default function History() {
   const [history, setHistory] = useState<GenerationHistory[]>([]);
-  const [leads, setLeads] = useState<Lead[]>([]);
 
   useEffect(() => {
     // Load from localStorage (in real app, would fetch from API)
@@ -21,25 +20,6 @@ export default function History() {
       }));
       setHistory(historyWithDates);
     }
-
-    // Mock leads data
-    setLeads([
-      {
-        id: '1',
-        name: 'John Smith',
-        email: 'john@example.com',
-        phone: '+1 (555) 123-4567',
-        createdAt: new Date(Date.now() - 86400000),
-      },
-      {
-        id: '2',
-        name: 'Sarah Johnson',
-        email: 'sarah@example.com',
-        phone: '+1 (555) 987-6543',
-        projectId: 'proj-123',
-        createdAt: new Date(Date.now() - 172800000),
-      },
-    ]);
   }, []);
 
   return (
@@ -50,18 +30,12 @@ export default function History() {
       </div>
 
       <Tabs defaultValue="history" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 glass-luxury h-auto p-1 mb-8">
+        <TabsList className="w-full  glass-luxury h-auto p-1 mb-8">
           <TabsTrigger 
             value="history"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
+            className="w-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
           >
             Generation History
-          </TabsTrigger>
-          <TabsTrigger 
-            value="leads"
-            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
-          >
-            Leads
           </TabsTrigger>
         </TabsList>
 
@@ -124,70 +98,6 @@ export default function History() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="leads" className="space-y-4">
-          {leads.length === 0 ? (
-            <div className="glass-luxury p-12 text-center space-y-4">
-              <p className="text-muted-foreground">No leads yet</p>
-            </div>
-          ) : (
-            <div className="glass-luxury rounded-lg overflow-hidden">
-              {/* Desktop table - hidden on mobile */}
-              <table className="w-full hidden md:table">
-                <thead className="bg-primary/10">
-                  <tr>
-                    <th className="text-left p-4 font-display">Name</th>
-                    <th className="text-left p-4 font-display">Email</th>
-                    <th className="text-left p-4 font-display">Phone</th>
-                    <th className="text-left p-4 font-display">Project</th>
-                    <th className="text-left p-4 font-display">Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead, index) => (
-                    <tr key={lead.id} className={index % 2 === 0 ? 'bg-background/50' : ''}>
-                      <td className="p-4 font-semibold">{lead.name}</td>
-                      <td className="p-4 text-muted-foreground">{lead.email}</td>
-                      <td className="p-4 text-muted-foreground">{lead.phone || '—'}</td>
-                      <td className="p-4 text-muted-foreground">{lead.projectId || '—'}</td>
-                      <td className="p-4 text-muted-foreground">
-                        {formatDistanceToNow(lead.createdAt, { addSuffix: true })}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              
-              {/* Mobile view - hidden on desktop */}
-              <div className="md:hidden">
-                {leads.map((lead) => (
-                  <div key={lead.id} className="border-b border-border/40 last:border-b-0">
-                    <div className="p-4 space-y-2">
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-display font-bold text-lg">{lead.name}</h3>
-                        <span className="text-sm text-muted-foreground">
-                          {formatDistanceToNow(lead.createdAt, { addSuffix: true })}
-                        </span>
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <p className="text-sm">
-                          <span className="font-semibold">Email:</span> {lead.email}
-                        </p>
-                        <p className="text-sm">
-                          <span className="font-semibold">Phone:</span> {lead.phone || '—'}
-                        </p>
-                        <p className="text-sm">
-                          <span className="font-semibold">Project:</span> {lead.projectId || '—'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
         </TabsContent>
