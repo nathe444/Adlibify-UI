@@ -24,7 +24,7 @@ dist-ssr
 *.sw?
 
 
-# assets/
+assets/
 *.mp4
 *.mov
 *.mkv
