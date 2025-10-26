@@ -24,8 +24,9 @@ dist-ssr
 *.sw?
 
 
+assets/
 *.mp4
 *.mov
-*.avi
 *.mkv
+*.avi
 *.webm
