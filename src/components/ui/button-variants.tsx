@@ -18,9 +18,9 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         // Luxury variants
-        luxury: "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-bold hover:scale-105 transform glow-gold",
+        luxury: "bg-gradient-gold text-primary-foreground font-bold hover:scale-105 transform glow-gold",
         glass: "glass-luxury text-foreground hover:bg-white/10 hover:-translate-y-1",
-        "outline-gold": "border-2 border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground hover:scale-105 transform",
+        "outline-gold": "border-2 border-primary bg-transparent text-primary hover:bg-gradient-gold hover:text-primary-foreground hover:scale-105 transform",
       },
       size: {
         default: "h-10 px-6 py-2",
