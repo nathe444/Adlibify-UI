@@ -34,13 +34,13 @@ const videoExamples = [
     category: 'home-service'
   },
   {
-    id: 'software-ad',  
+    id: 'software-ad',
     title: 'Software Advertisement',
     description: 'Demonstrate your software features with clean UI walkthroughs',
     videoUrl: softwareAdVideo,
-    duration: '11s',  
+    duration: '11s',
     category: 'software-ad'
-  }  
+  }
 ];
 
 export default function Landing() {
@@ -49,9 +49,9 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
-            src={heroImage} 
-            alt="Professional video production" 
+          <img
+            src={heroImage}
+            alt="Professional video production"
             className="w-full h-full object-cover opacity-40"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/80 to-background" />
@@ -62,13 +62,13 @@ export default function Landing() {
             <Sparkles className="h-4 w-4 text-primary animate-glow-pulse" />
             <span className="text-sm font-semibold">AI-Powered Video Generation</span>
           </div>
-          
+
           <h1 className="text-6xl md:text-8xl font-display font-bold leading-tight">
             Create Stunning Videos
             <br />
-            <span className="text-primary">In Seconds</span>
+            <span className="text-primary font-cursive">In Seconds</span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
             Generate professional UGC, service, and software videos with our luxury AI platform
           </p>
@@ -83,8 +83,8 @@ export default function Landing() {
             <Button variant="outline-gold" size="xl" onClick={() =>
               document.getElementById("examples").scrollIntoView({ behavior: "smooth" })
             }>
-                View Examples
-              </Button>
+              View Examples
+            </Button>
           </div>
         </div>
       </section>
