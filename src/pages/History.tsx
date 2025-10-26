@@ -4,6 +4,7 @@ import { GenerationHistory, Lead } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Download, RefreshCw, Sparkles, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 export default function History() {
   const [history, setHistory] = useState<GenerationHistory[]>([]);
@@ -31,7 +32,7 @@ export default function History() {
 
       <Tabs defaultValue="history" className="w-full">
         <TabsList className="w-full  glass-luxury h-auto p-1 mb-8">
-          <TabsTrigger 
+          <TabsTrigger
             value="history"
             className="w-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3"
           >
@@ -44,7 +45,9 @@ export default function History() {
             <div className="glass-luxury p-12 text-center space-y-4">
               <Sparkles className="h-12 w-12 mx-auto text-muted-foreground" />
               <p className="text-muted-foreground">No generations yet. Start creating in the Studio!</p>
-              <Button variant="luxury">Go to Studio</Button>
+              <Link to="/studio">
+                <Button variant="luxury">Go to Studio</Button>
+              </Link>
             </div>
           ) : (
             <div className="grid gap-4">
@@ -53,7 +56,7 @@ export default function History() {
                   <div className="flex flex-col md:flex-row gap-4">
                     {/* Thumbnail */}
                     <div className="w-full md:w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                      <img 
+                      <img
                         src={item.thumbnail}
                         alt={item.title}
                         className="w-full h-full object-cover"
